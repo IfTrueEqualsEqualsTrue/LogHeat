@@ -1,4 +1,5 @@
 """ Main file for user interface"""
+import os
 
 from UI_Tools import *
 from UI_LiveDisplayFrame import LiveDisplayFrame
@@ -9,10 +10,10 @@ class MainApp(ctk.CTk):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.title('GammaTrack')
+        self.title('LogHeat')
         self.geometry('720x540')
-        # self.iconbitmap('ressources/icon.ico')
-        self.configure(fg_color=colors['gray'])
+        self.iconbitmap(os.path.join('ressources', 'icon.ico'))
+        self.configure(fg_color=colors['white'])
         self.active_frame = LiveDisplayFrame(self, fg_color='transparent')
         self.previous_frame = None
         self.display()
