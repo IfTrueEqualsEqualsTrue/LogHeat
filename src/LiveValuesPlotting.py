@@ -6,7 +6,7 @@ import time
 import matplotlib.animation as animation
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from UI_Tools import ctk
+from UI_Tools import ctk, colors
 
 from ComEmulator import COMPortReader, start_emulation, stop_emulation
 
@@ -23,7 +23,7 @@ com_reader = COMPortReader.get_instance()
 
 fig, ax = plt.subplots()
 ax.set_ylim(0, 500)  # Set y-axis limits
-line, = ax.plot([], [], lw=2)  # Initialize the line object
+line, = ax.plot([], [], lw=2, color=colors["yellow"])  # Initialize the line object
 
 
 # noinspection PyUnusedLocal
@@ -40,10 +40,11 @@ def update_plot(frame):
 
     try:
         if not com_reader.data_queue.empty():
+
             new_data = com_reader.data_queue.get_nowait()
-            values = [float(val) for val in new_data.split('\n')[:-1]]
-            y_data.extend(values)
-            x_data.extend([elapsed_time] * len(values))
+
+            y_data.append(new_data)
+            x_data.append(elapsed_time)
 
         if len(x_data) > max_displayed_values:  # Limit the plot to the last max_displayed_values points
             x_data = x_data[-max_displayed_values:]
