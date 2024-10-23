@@ -59,5 +59,4 @@ class MainFrame(ctk.CTkFrame):
 
 
 
-
 app = MainApp()

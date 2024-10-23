@@ -6,11 +6,13 @@ import time
 import matplotlib.animation as animation
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+
+from CSV_Manager import CsvManager
 from UI_Tools import ctk, colors
 
 from ComEmulator import COMPortReader, start_emulation, stop_emulation
 
-refresh_interval = 50  # Frame update interval in milliseconds
+refresh_interval = 1000  # Frame update interval in milliseconds
 visible_timespan = 10  # Visible time window on the animated frame in SECONDS
 max_displayed_values = int(1000 * visible_timespan / 50)  # Max number of values in both list displayed in the window
 
@@ -24,6 +26,8 @@ com_reader: COMPortReader = None
 fig, ax = plt.subplots()
 ax.set_ylim(-10, 50)  # Set y-axis limits
 line, = ax.plot([], [], lw=2, color=colors["yellow"])  # Initialize the line object
+
+csv_writer = CsvManager()
 
 
 # noinspection PyUnusedLocal
@@ -56,6 +60,9 @@ def update_plot(frame):
         upper_bound = elapsed_time + 1  # adding 1 second to unstick the latest value from the right side
 
         ax.set_xlim(lower_bound, upper_bound)
+
+        if len(x_data) % 10 == 0:  # Saving each 10s
+            csv_writer.write(zip(x_data[-10:], y_data[-10:]))
 
     except queue.Empty:
         pass  # No new data available yet
