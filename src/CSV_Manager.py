@@ -14,3 +14,13 @@ class CsvManager:
         with open(self.path, 'a', newline='') as csvfile:
             self.writer = csv.writer(csvfile)
             self.writer.writerows(rows)
+
+    def clean(self):
+        os.remove(self.path)
+
+
+csv_manager = CsvManager()
+
+
+def get_csv_manager():
+    return csv_manager
