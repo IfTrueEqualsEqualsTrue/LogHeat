@@ -1,8 +1,8 @@
 import os
 import shutil
 
-from LiveValuesPlotting import set_frontend
-from UI_Tools import ctk, center, fastgrid, save_img
+from LiveValuesPlotting import PlotManager
+from UI_Tools import ctk, center, fastgrid
 from tkinter import filedialog
 
 
@@ -26,10 +26,9 @@ class MainFrame(ctk.CTkFrame):
 
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)
-        self.state = False
-        self.option_menu = ctk.CTkOptionMenu(self, values=['COM1', 'COM5'], command=self.update_com_port)
+        self.plot_manager = PlotManager()
+        self.option_menu = ctk.CTkOptionMenu(self, values=['COM1', 'COM2', 'COM5'], command=self.update_com_port)
         self.start_stop_button = ctk.CTkButton(self, command=self.button_clicked, text='Start')
-        set_frontend(self)
 
         self.plot_frame = None
 
@@ -43,24 +42,23 @@ class MainFrame(ctk.CTkFrame):
         return self.option_menu.get()
 
     def update_com_port(self, event=None):
-        from LiveValuesPlotting import set_reader, get_plot_frame
         com_port = self.get_com_port()
-        set_reader(com_port)
-        self.plot_frame = get_plot_frame(self)
+        self.plot_manager.set_reader(com_port)
+        self.plot_frame = self.plot_manager.get_plot_frame(self)
         fastgrid(self.plot_frame, 1, 0, 20, 20, '')
+        self.plot_manager.start_animation()
 
     def button_clicked(self):
-        if self.state:
+        self.plot_manager.add_vertical_line()
+        if self.plot_manager.csv_saver.is_saving:
+            self.plot_manager.csv_saver.stop_saving()
             self.start_stop_button.configure(text='Start')
-            self.state = False
             self._on_save()
         else:
+            self.plot_manager.csv_saver.start_saving()
             self.start_stop_button.configure(text='Stop')
-            self.state = True
 
-    @staticmethod
-    def _on_save():
+    def _on_save(self):
         target_filename = filedialog.asksaveasfilename(defaultextension='.csv')
-        from LiveValuesPlotting import csv_writer
-        source = csv_writer.path
+        source = self.plot_manager.csv_saver.csv_writer.path
         shutil.copy(source, target_filename)
