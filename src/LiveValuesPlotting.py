@@ -101,6 +101,8 @@ class PlotManager:
         return frame
 
     def set_reader(self, port):
+        if self.com_reader is not None:
+            self.com_reader.stop()
         self.com_reader = COMPortReader.get_instance(port)
         self.com_reader.start()
 
@@ -109,6 +111,9 @@ class PlotManager:
 
     def stop_saving(self):
         self.csv_saver.stop_saving()
+
+    def stop_animation(self):
+        ani.event_source.stop()
 
 
 class CsvSaver:

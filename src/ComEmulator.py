@@ -72,14 +72,13 @@ class COMPortReader:
         return cls._instance
 
     def __init__(self, port, baudrate):
-        if not hasattr(self, 'initialized'):  # Prevent reinitialization
-            self.port = port
-            self.baudrate = baudrate
-            self.ser = serial.Serial(port, baudrate)
-            self.is_running = False
-            self.thread = None
-            self.data_queue = queue.Queue()
-            self.initialized = True
+        self.port = port
+        self.baudrate = baudrate
+        self.ser = serial.Serial(port, baudrate)
+        self.is_running = False
+        self.thread = None
+        self.data_queue = queue.Queue()
+        self.initialized = True
 
     def start(self):
         if not self.is_running:
@@ -99,7 +98,6 @@ class COMPortReader:
                 if data:
                     try:
                         temperature = float(data)
-                        print(temperature)
                         self.data_queue.put(temperature)
                     except ValueError:
                         logging.error(f"Invalid data received: {data}")  # Handle any non-float data
@@ -120,9 +118,6 @@ def start_emulation():
     simulator = COMPortSimulator.get_instance()
     simulator.start()
     print("Emulation started.")
-
-
-start_emulation()
 
 
 def stop_emulation():
