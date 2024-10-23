@@ -6,6 +6,7 @@ from tkinter import filedialog
 
 from ComEmulator import COMPortReader
 from LiveValuesPlotting import PlotManager
+from PathConfig import base_path
 from UI_Tools import ctk, center, fastgrid, colors
 
 
@@ -19,7 +20,7 @@ class MainApp(ctk.CTk):
         super().__init__(**kwargs)
         self.title('LogHeat')
         self.geometry('1080x720')
-        self.iconbitmap(os.path.join('ressources', 'icon.ico'))
+        self.iconbitmap(os.path.join(base_path, 'ressources', 'icon.ico'))
         self.configure(fg_color=colors['black'])
         font = ctk.CTkFont('Cousine', size=20)
         self.mainFrame = MainFrame(self, fg_color='transparent')

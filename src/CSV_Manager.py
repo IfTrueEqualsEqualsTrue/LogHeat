@@ -1,7 +1,9 @@
 import csv
 import os
 
-temp_file_path = os.path.join('data', 'temp_csv.csv')
+from PathConfig import base_path
+
+temp_file_path = os.path.join(base_path, 'data', 'temp_csv.csv')
 
 
 class CsvManager:
