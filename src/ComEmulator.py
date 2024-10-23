@@ -109,8 +109,8 @@ class COMPortReader:
         return None
 
     @classmethod
-    def get_instance(cls):
-        return cls(read_port, bdrate)
+    def get_instance(cls, com_port):
+        return cls(com_port, bdrate)
 
 
 def start_emulation():

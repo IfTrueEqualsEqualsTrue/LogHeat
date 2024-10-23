@@ -19,7 +19,7 @@ y_data = []
 start_time = None
 line = None  # Declare line at module level
 
-com_reader = COMPortReader.get_instance()
+com_reader: COMPortReader = None
 
 fig, ax = plt.subplots()
 ax.set_ylim(-10, 50)  # Set y-axis limits
@@ -90,3 +90,8 @@ def get_plot_frame(master):
     canvas.get_tk_widget().pack(fill="both", expand=True)
 
     return frame
+
+
+def set_reader(port):
+    global com_reader
+    com_reader = COMPortReader.get_instance(port)

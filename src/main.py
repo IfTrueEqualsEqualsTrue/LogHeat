@@ -1,5 +1,5 @@
 from ComEmulator import *
-from UI_main import MainApp
+from Interface import MainApp
 
 """ Note : run this script with a configuration runnning main.py working in the project's directory """
 
