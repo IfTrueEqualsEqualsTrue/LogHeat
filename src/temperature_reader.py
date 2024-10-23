@@ -9,10 +9,10 @@ time.sleep(1)
 try:
     while True:
 
-        line = ser.readline().decode('utf-8').strip()
+        vline = ser.readline().decode('utf-8').strip()
 
-        if line:
-            print(f"Temperature: {line}")
+        if vline:
+            print(f"Temperature: {vline}")
 
         time.sleep(1)
 

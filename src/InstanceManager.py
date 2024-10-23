@@ -11,11 +11,3 @@ def get_root():
     return _root
 
 
-def set_study(new_study):
-    global _study
-    _study = new_study
-
-
-def get_study():
-    return _study
-

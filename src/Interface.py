@@ -1,6 +1,9 @@
 import os
+import shutil
 
+from LiveValuesPlotting import set_frontend
 from UI_Tools import ctk, center, fastgrid, save_img
+from tkinter import filedialog
 
 
 class MainApp(ctk.CTk):
@@ -23,19 +26,18 @@ class MainFrame(ctk.CTkFrame):
 
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)
+        self.state = False
         self.option_menu = ctk.CTkOptionMenu(self, values=['COM1', 'COM5'], command=self.update_com_port)
-        self.start_stop_button = ctk.CTkButton(self, command=self.button_clicked, text='Start / Stop')
-        self.save_button = ctk.CTkButton(self, command=self.on_save, text='', image=save_img, width=40, height=40)
+        self.start_stop_button = ctk.CTkButton(self, command=self.button_clicked, text='Start')
+        set_frontend(self)
 
         self.plot_frame = None
 
         self.grid_rowconfigure((0, 1), weight=1)
-        self.grid_columnconfigure((0, 2), weight=0)
-        self.grid_columnconfigure(1, weight=1)
+        self.grid_columnconfigure(0, weight=1)
 
-        fastgrid(self.option_menu, 0, 0, 20, 20, '', columnspan=2)
-        fastgrid(self.save_button, 2, 0, 20, 20, 'e')
-        fastgrid(self.start_stop_button, 2, 1, 20, 20, '')
+        fastgrid(self.option_menu, 0, 0, 20, 20, '')
+        fastgrid(self.start_stop_button, 2, 0, 20, 20, '')
 
     def get_com_port(self):
         return self.option_menu.get()
@@ -45,10 +47,20 @@ class MainFrame(ctk.CTkFrame):
         com_port = self.get_com_port()
         set_reader(com_port)
         self.plot_frame = get_plot_frame(self)
-        fastgrid(self.plot_frame, 1, 0, 20, 20, '', columnspan=2)
+        fastgrid(self.plot_frame, 1, 0, 20, 20, '')
 
     def button_clicked(self):
-        pass
+        if self.state:
+            self.start_stop_button.configure(text='Start')
+            self.state = False
+            self._on_save()
+        else:
+            self.start_stop_button.configure(text='Stop')
+            self.state = True
 
-    def on_save(self):
-        pass
+    @staticmethod
+    def _on_save():
+        target_filename = filedialog.asksaveasfilename(defaultextension='.csv')
+        from LiveValuesPlotting import csv_writer
+        source = csv_writer.path
+        shutil.copy(source, target_filename)
