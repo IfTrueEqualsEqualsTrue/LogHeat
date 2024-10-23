@@ -1,5 +1,7 @@
 import os
 import shutil
+import threading
+import time
 from tkinter import filedialog
 
 from ComEmulator import COMPortReader
@@ -29,6 +31,9 @@ class MainFrame(ctk.CTkFrame):
 
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)
+        self.blinking_interval = 1
+        self.blinking_thread_running = None
+        self.blinking_thread = None
         self.option_menu = ctk.CTkOptionMenu(self, values=['COM1', 'COM2', 'COM5'], command=self.update_com_port,
                                              fg_color=colors['white'], button_color=colors['yellow'], font=font,
                                              text_color=colors['black'])
@@ -71,8 +76,30 @@ class MainFrame(ctk.CTkFrame):
             self.plot_manager.csv_saver.csv_writer.clean()
             self.plot_manager.csv_saver.start_saving()
             self.start_stop_button.configure(text='Stop')
+            self.start_blinking_thread()
 
     def _on_save(self):
-        target_filename = filedialog.asksaveasfilename(defaultextension='.csv')
-        source = self.plot_manager.csv_saver.csv_writer.path
-        shutil.copy(source, target_filename)
+        try:
+            target_filename = filedialog.asksaveasfilename(defaultextension='.csv')
+            source = self.plot_manager.csv_saver.csv_writer.path
+            shutil.copy(source, target_filename)
+        except FileNotFoundError:
+            pass
+    
+    def start_blinking_thread(self):
+        self.blinking_thread = threading.Thread(target=self.blinking_loop, daemon=True)
+        self.blinking_thread_running = True
+        self.blinking_thread.start()
+    
+    def blinking_loop(self):
+        while self.blinking_thread_running:
+            time.sleep(self.blinking_interval)
+            if not self.plot_manager.csv_saver.is_saving:
+                break  # Exit the loop if saving is stopped
+            self.start_stop_button.configure(border_color=colors['red'])
+            time.sleep(0.1)
+            self.start_stop_button.configure(border_color=colors['yellow'])
+
+        self.blinking_thread_running = False  # Mark the thread as stopped when it exits
+
+    

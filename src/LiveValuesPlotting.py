@@ -20,7 +20,7 @@ ani = None
 class PlotManager:
     def __init__(self, visible_timespan=visible_timespan, refresh_interval=refresh_interval):
         self.visible_timespan = visible_timespan
-        self.max_displayed_values = int(1000 * visible_timespan / 50)
+        self.max_displayed_values = int(1000 * visible_timespan / refresh_interval)
         self.refresh_interval = refresh_interval
         self.com_reader = None
         self.start_time = None
@@ -31,6 +31,8 @@ class PlotManager:
         self.fig, self.ax = plt.subplots()
         self.ax.set_ylim(-10, 50)  # Set y-axis limits
         self.plot_line, = self.ax.plot([], [], lw=2, color=colors["yellow"])
+        self.ax.set_xlabel("Time (seconds)")  # Replace with your desired x-axis label
+        self.ax.set_ylabel("Temperature (°C)")  # Replace with your desired y-axis label
 
         self.csv_saver = CsvSaver(self, backup_time)
 
@@ -124,6 +126,7 @@ class CsvSaver:
         self.backup_interval = backup_interval
         self.last_saved_time = 0
         self.backup_thread = None
+        self.last_saved_index = 0  # Track the last index saved
         self.backup_thread_running = False  # Flag to indicate if the thread is running
 
     def start_saving(self):
@@ -157,5 +160,15 @@ class CsvSaver:
 
     def save_backup_data(self):
         print(f"Performing backup at {time.time()}")
-        self.csv_writer.write(zip(self.plot_manager.x_data[-int(self.backup_interval / refresh_interval):],
-                                  self.plot_manager.y_data[-int(self.backup_interval / refresh_interval):]))
+
+        # Get the current length of x_data to avoid duplicates
+        current_length = len(self.plot_manager.x_data)
+
+        if self.last_saved_index < current_length:
+            # Only save new data since last saved index
+            rows = zip(self.plot_manager.x_data[self.last_saved_index:current_length],
+                       self.plot_manager.y_data[self.last_saved_index:current_length])
+            self.csv_writer.write(rows)
+            self.last_saved_index = current_length  # Update the last saved index
+        else:
+            print("No new data to save.")

@@ -16,7 +16,10 @@ class CsvManager:
             self.writer.writerows(rows)
 
     def clean(self):
-        os.remove(self.path)
+        try:
+            os.remove(self.path)
+        except FileNotFoundError:
+            pass
 
 
 csv_manager = CsvManager()
