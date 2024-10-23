@@ -1,6 +1,6 @@
 """ Interface to display incoming values in real-time"""
 
-from UI_Tools import *
+from UI_Tools import ctk, center, fastgrid
 from LiveValuesPlotting import get_plot_frame
 
 

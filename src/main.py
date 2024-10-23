@@ -1,8 +1,8 @@
-from ComEmulator import *
 from Interface import MainApp
 
 """ Note : run this script with a configuration runnning main.py working in the project's directory """
 
 
 if __name__ == '__main__':
-    MainApp()
+    app = MainApp()
+    app.mainloop()

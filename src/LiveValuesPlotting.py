@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 from CSV_Manager import CsvManager
-from UI_Tools import ctk, colors
+from UI_Tools import colors, ctk
 
 from ComEmulator import COMPortReader, start_emulation, stop_emulation
 
