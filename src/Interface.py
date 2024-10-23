@@ -8,7 +8,7 @@ from ComEmulator import COMPortReader
 from LiveValuesPlotting import PlotManager
 from PathConfig import base_path
 from UI_Tools import ctk, center, fastgrid, colors
-
+from Utils import get_available_com_ports
 
 global font
 
@@ -35,12 +35,12 @@ class MainFrame(ctk.CTkFrame):
         self.blinking_interval = 1
         self.blinking_thread_running = None
         self.blinking_thread = None
-        self.option_menu = ctk.CTkOptionMenu(self, values=['COM1', 'COM2', 'COM5'], command=self.update_com_port,
+        self.option_menu = ctk.CTkOptionMenu(self, values=get_available_com_ports(), command=self.update_com_port,
                                              fg_color=colors['white'], button_color=colors['yellow'], font=font,
                                              text_color=colors['black'])
         self.start_stop_button = ctk.CTkButton(self, command=self.button_clicked, text='Start',
-                                               fg_color=colors['white'], border_color=colors['yellow'], border_width=3,
-                                               hover_color=colors['hwhite'], text_color=colors['black'], height=35,
+                                               fg_color=colors['hwhite'], border_color=colors['yellow'], border_width=3,
+                                               hover_color=colors['white'], text_color=colors['black'], height=35,
                                                width=200, font=font)
         self.plot_frame = None
         self.plot_manager = None
