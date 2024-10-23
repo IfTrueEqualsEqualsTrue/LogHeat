@@ -8,7 +8,7 @@ import serial
 logging.basicConfig(level=logging.ERROR)
 
 write_port = 'COM1'
-read_port = 'COM2'
+read_port = 'COM5'
 frequency = 5
 bdrate = 9600
 
@@ -129,7 +129,7 @@ def test_emulation():
     simulator = COMPortSimulator.get_instance()
     reader = COMPortReader.get_instance()
 
-    simulator.start()
+    # simulator.start()
     reader.start()
 
     try:

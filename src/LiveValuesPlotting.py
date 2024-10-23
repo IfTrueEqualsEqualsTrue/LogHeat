@@ -22,7 +22,7 @@ line = None  # Declare line at module level
 com_reader = COMPortReader.get_instance()
 
 fig, ax = plt.subplots()
-ax.set_ylim(0, 500)  # Set y-axis limits
+ax.set_ylim(-10, 50)  # Set y-axis limits
 line, = ax.plot([], [], lw=2, color=colors["yellow"])  # Initialize the line object
 
 
@@ -79,7 +79,7 @@ def start_animation():
 
 def get_plot_frame(master):
 
-    start_emulation()
+    # start_emulation()
     com_reader.start()
 
     ani = start_animation()
