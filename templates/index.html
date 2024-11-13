@@ -2,18 +2,53 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Toggle Button</title>
-</head>
-<body>
-    <button id="toggleButton" onclick="toggleState()">Toggle</button>
+    <title>Start Button</title>
     <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            fetch('/get_com_ports')
+                .then(response => response.json())
+                .then(data => {
+                    const dropdownMenu = document.getElementById('dropdownMenu');
+                    data.ports.forEach(port => {
+                        const option = document.createElement('option');
+                        option.value = port;
+                        option.text = port;
+                        dropdownMenu.add(option);
+                    });
+                });
+        });
+
         function toggleState() {
             fetch('/toggle', { method: 'POST' })
                 .then(response => response.json())
                 .then(data => {
+                    const button = document.getElementById('startButton');
+                    button.textContent = data.state ? 'Stop' : 'Start';
                     console.log('State:', data.state);
                 });
         }
+
+        function updateComPort() {
+            const selectedPort = document.getElementById('dropdownMenu').value;
+            fetch('/update_com_port', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ port: selectedPort })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('COM Port updated to:', data.port);
+            });
+        }
     </script>
+</head>
+<body>
+<select id="dropdownMenu" onchange="updateComPort()">
+    <!-- Options will be populated here -->
+</select>
+<br><br>
+<button id="startButton" onclick="toggleState()">Start</button>
 </body>
 </html>
