@@ -72,5 +72,3 @@ class CsvSaver:
 
 
 saver = CsvSaver(plot_manager, backup_time)
-
-
