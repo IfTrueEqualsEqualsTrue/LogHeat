@@ -15,6 +15,7 @@ def index():
 @app.route('/toggle', methods=['POST'])
 def toggle():
     saver.toggle_saving()
+    plot_manager.add_vertical_line()
     return jsonify(state=saver.is_saving)
 
 
