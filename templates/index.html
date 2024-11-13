@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Start Button</title>
+    <title>Temperature Plot</title>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script>
         let plotInterval;
@@ -19,6 +19,9 @@
                         dropdownMenu.add(option);
                     });
                 });
+
+            fetchPlotData();
+            plotInterval = setInterval(fetchPlotData, 50);  // Fetch plot data every 50 milliseconds
         });
 
         function toggleState() {
@@ -53,20 +56,17 @@
         }
 
         function startPlotUpdate() {
-            plotInterval = setInterval(updatePlot, 50);  // Update plot every 50ms
+            plotInterval = setInterval(fetchPlotData, 50);  // Update plot every 50ms
         }
 
         function stopPlotUpdate() {
             clearInterval(plotInterval);
         }
 
-        function updatePlot() {
-            fetch('/plot_data')
-                .then(response => response.json())
-                .then(data => {
-                    const plotDiv = document.getElementById('plot');
-                    Plotly.react(plotDiv, JSON.parse(data).data, JSON.parse(data).layout);
-                });
+        async function fetchPlotData() {
+            const response = await fetch('/plot_data');
+            const plotData = await response.json();
+            Plotly.react('plot', plotData.data, plotData.layout);
         }
     </script>
 </head>

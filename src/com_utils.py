@@ -27,7 +27,7 @@ class COMPortSimulator:
             self.port = port
             self.baudrate = baudrate
             self.frequency = frequency
-            self.ser = serial.Serial(port, baudrate)
+            self.ser = None
             self.is_running = False
             self.thread = None
             self.initialized = True
@@ -38,14 +38,20 @@ class COMPortSimulator:
 
     def start(self):
         if not self.is_running:
-            self.is_running = True
-            self.thread = threading.Thread(target=self.run)
-            self.thread.start()
+            try:
+                self.ser = serial.Serial(self.port, self.baudrate)
+                self.is_running = True
+                self.thread = threading.Thread(target=self.run)
+                self.thread.start()
+            except serial.SerialException as e:
+                logging.error(f"Failed to open serial port {self.port}: {e}")
 
     def stop(self):
         self.is_running = False
         if self.thread:
             self.thread.join()
+        if self.ser:
+            self.ser.close()
 
     def run(self):
         while self.is_running:
@@ -144,6 +150,3 @@ def test_emulation():
     finally:
         simulator.stop()
         reader.stop()
-
-
-start_emulation()

@@ -3,7 +3,7 @@ import time
 
 import plotly.graph_objs as go
 
-from com_utils import COMPortReader
+from com_utils import COMPortReader, start_emulation
 
 visible_timespan = 10
 refresh_interval = 50
@@ -27,7 +27,6 @@ class PlotManager:
             yaxis_title="Temperature (°C)",
             yaxis=dict(range=[-10, 50])
         )
-
         self.add_line_next = False  # Flag to control when to add a vertical line
 
     def update_plot(self):
