@@ -9,8 +9,8 @@ i = 1
 while True:
 
     if ser.in_waiting > 0:
-        line = ser.readline().decode('utf-8').rstrip()
-        voltages = line.split(',')
+        vline = ser.readline().decode('utf-8').rstrip()
+        voltages = vline.split(',')
         if len(voltages) == 2:
             tot += float(voltages[0])
             moy = tot / i

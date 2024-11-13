@@ -3,13 +3,13 @@ import queue
 import random
 import threading
 import time
+
 import serial
 
 logging.basicConfig(level=logging.ERROR)
 
 write_port = 'COM1'
-read_port = 'COM2'
-frequency = 5
+frequency = 2
 bdrate = 9600
 
 
@@ -21,8 +21,9 @@ class COMPortSimulator:
             cls._instance = super(COMPortSimulator, cls).__new__(cls)
         return cls._instance
 
-    def __init__(self, port, baudrate, frequency):
+    def __init__(self, port, baudrate, frequency, display=False):
         if not hasattr(self, 'initialized'):  # Prevent reinitialization
+            self.display_sent_data = display
             self.port = port
             self.baudrate = baudrate
             self.frequency = frequency
@@ -33,7 +34,7 @@ class COMPortSimulator:
 
     @staticmethod
     def generate_data():
-        return f"{random.randint(0, 500)}\n"
+        return f"{random.randint(-10, 50)}\n"
 
     def start(self):
         if not self.is_running:
@@ -50,7 +51,8 @@ class COMPortSimulator:
         while self.is_running:
             try:
                 data = self.generate_data()
-                print(f'Sent : {data}\n')
+                if self.display_sent_data:
+                    print(f'Sent : {data}\n')
                 self.ser.write(data.encode())
             except serial.SerialException as e:
                 logging.error(f"Serial port error: {e}")
@@ -70,14 +72,13 @@ class COMPortReader:
         return cls._instance
 
     def __init__(self, port, baudrate):
-        if not hasattr(self, 'initialized'):  # Prevent reinitialization
-            self.port = port
-            self.baudrate = baudrate
-            self.ser = serial.Serial(port, baudrate)
-            self.is_running = False
-            self.thread = None
-            self.data_queue = queue.Queue()
-            self.initialized = True
+        self.port = port
+        self.baudrate = baudrate
+        self.ser = serial.Serial(port, baudrate)
+        self.is_running = False
+        self.thread = None
+        self.data_queue = queue.Queue()
+        self.initialized = True
 
     def start(self):
         if not self.is_running:
@@ -109,8 +110,8 @@ class COMPortReader:
         return None
 
     @classmethod
-    def get_instance(cls):
-        return cls(read_port, bdrate)
+    def get_instance(cls, com_port):
+        return cls(com_port, bdrate)
 
 
 def start_emulation():
@@ -127,7 +128,7 @@ def stop_emulation():
 
 def test_emulation():
     simulator = COMPortSimulator.get_instance()
-    reader = COMPortReader.get_instance()
+    reader = COMPortReader.get_instance('COM2')
 
     simulator.start()
     reader.start()

@@ -1,0 +1,1 @@
+pyinstaller --distpath C:\Users\guill\Desktop\Code\LogHeat\compilation\build main.spec --noconfirm
