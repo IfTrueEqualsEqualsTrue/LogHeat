@@ -80,6 +80,7 @@ class COMPortReader:
     def __init__(self, port, baudrate):
         self.port = port
         self.baudrate = baudrate
+        print('reader on port:', port)
         self.ser = serial.Serial(port, baudrate)
         self.is_running = False
         self.thread = None

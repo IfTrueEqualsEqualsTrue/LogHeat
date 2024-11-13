@@ -2,6 +2,7 @@ import threading
 import time
 
 from csv_manager import CsvManager
+from dynamic_plot import plot_manager
 
 backup_time = 3
 
@@ -9,7 +10,7 @@ backup_time = 3
 class CsvSaver:
     def __init__(self, plot_manager, backup_interval):
         self.csv_writer = CsvManager()
-        # self.plot_manager = plot_manager
+        self.plot_manager = plot_manager
         self.is_saving = False
         self.backup_interval = backup_interval
         self.last_saved_time = 0
@@ -49,7 +50,7 @@ class CsvSaver:
                 break  # Exit the loop if saving is stopped
             current_time = time.time()
             if current_time - self.last_saved_time >= self.backup_interval:
-                # self.save_backup_data()
+                self.save_backup_data()
                 self.last_saved_time = current_time
 
         self.backup_thread_running = False  # Mark the thread as stopped when it exits
@@ -70,4 +71,6 @@ class CsvSaver:
             print("No new data to save.")
 
 
-saver = CsvSaver(None, backup_time)
+saver = CsvSaver(plot_manager, backup_time)
+
+

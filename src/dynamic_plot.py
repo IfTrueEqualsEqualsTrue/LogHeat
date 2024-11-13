@@ -3,7 +3,7 @@ import time
 
 import plotly.graph_objs as go
 
-from com_utils import COMPortReader, start_emulation
+from com_utils import COMPortReader
 
 visible_timespan = 10
 refresh_interval = 50
@@ -54,7 +54,7 @@ class PlotManager:
                     self.add_line_next = False  # Reset the flag after adding the line
 
                 return new_data
-        except queue.Empty:
+        except (queue.Empty, AttributeError):
             pass
         return None
 
@@ -90,3 +90,6 @@ class PlotManager:
     def get_plot_json(self):
         self.update_plot()
         return self.fig.to_json()
+
+
+plot_manager = PlotManager()

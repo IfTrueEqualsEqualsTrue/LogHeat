@@ -2,80 +2,18 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Temperature Plot</title>
+    <title>LogHeat</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <script>
-        let plotInterval;
-
-        document.addEventListener('DOMContentLoaded', (event) => {
-            fetch('/get_com_ports')
-                .then(response => response.json())
-                .then(data => {
-                    const dropdownMenu = document.getElementById('dropdownMenu');
-                    data.ports.forEach(port => {
-                        const option = document.createElement('option');
-                        option.value = port;
-                        option.text = port;
-                        dropdownMenu.add(option);
-                    });
-                });
-
-            fetchPlotData();
-            plotInterval = setInterval(fetchPlotData, 50);  // Fetch plot data every 50 milliseconds
-        });
-
-        function toggleState() {
-            fetch('/toggle', { method: 'POST' })
-                .then(response => response.json())
-                .then(data => {
-                    const button = document.getElementById('startButton');
-                    if (data.state) {
-                        button.textContent = 'Stop';
-                        startPlotUpdate();
-                    } else {
-                        button.textContent = 'Start';
-                        stopPlotUpdate();
-                    }
-                    console.log('State:', data.state);
-                });
-        }
-
-        function updateComPort() {
-            const selectedPort = document.getElementById('dropdownMenu').value;
-            fetch('/update_com_port', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ port: selectedPort })
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log('COM Port updated to:', data.port);
-            });
-        }
-
-        function startPlotUpdate() {
-            plotInterval = setInterval(fetchPlotData, 50);  // Update plot every 50ms
-        }
-
-        function stopPlotUpdate() {
-            clearInterval(plotInterval);
-        }
-
-        async function fetchPlotData() {
-            const response = await fetch('/plot_data');
-            const plotData = await response.json();
-            Plotly.react('plot', plotData.data, plotData.layout);
-        }
-    </script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </head>
 <body>
-    <select id="dropdownMenu" onchange="updateComPort()">
-        <!-- Options will be populated here -->
-    </select>
-    <br><br>
-    <button id="startButton" onclick="toggleState()">Start</button>
+    <div class="button-container">
+        <select id="dropdownMenu" onchange="updateComPort()">
+            <!-- Options will be populated here -->
+        </select>
+        <button id="startButton" onclick="toggleState()">Start</button>
+    </div>
     <div id="plot"></div>
 </body>
 </html>

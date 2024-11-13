@@ -1,11 +1,10 @@
 from flask import Flask, render_template, jsonify, request
 
 from backend import saver
-from dynamic_plot import PlotManager
+from dynamic_plot import plot_manager
 from utils import get_com_ports_json
 
-app = Flask(__name__, template_folder='../templates')
-plot_manager = PlotManager()
+app = Flask(__name__, template_folder='../templates', static_folder='../static')
 
 
 @app.route('/')
