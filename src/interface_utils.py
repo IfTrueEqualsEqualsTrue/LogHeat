@@ -3,7 +3,7 @@ import os
 import customtkinter as ctk
 from PIL import Image
 
-from PathConfig import base_path
+from path_config import base_path
 
 colors = {'black': '#1e1e1e', 'blue': '#14213d', 'red': '#b22b3b', 'yellow': '#fca311', 'white': '#e5e5e5',
           'hwhite': '#FFFFFF'}

@@ -1,8 +1,11 @@
 from flask import Flask, render_template, jsonify, request
-from Interface import backend
-from Utils import get_com_ports_json
+
+from backend import saver
+from dynamic_plot import PlotManager
+from utils import get_com_ports_json
 
 app = Flask(__name__, template_folder='../templates')
+plot_manager = PlotManager()
 
 
 @app.route('/')
@@ -12,16 +15,15 @@ def index():
 
 @app.route('/toggle', methods=['POST'])
 def toggle():
-    backend.button_clicked()
-    print(f'Saving state : {backend.plot_manager.csv_saver.is_saving}')
-    return jsonify(state=backend.plot_manager.csv_saver.is_saving)
+    saver.toggle_saving()
+    return jsonify(state=saver.is_saving)
 
 
 @app.route('/update_com_port', methods=['POST'])
 def update_com_port():
     data = request.get_json()
-    backend.update_com_port(data['port'])
-    print(f'COM Port updated to: {data["port"]}')
+    print('setting reader')
+    plot_manager.set_reader(data['port'])
     return jsonify(port=data['port'])
 
 
@@ -30,5 +32,6 @@ def get_com_ports():
     return get_com_ports_json()
 
 
-if __name__ == '__main__':
-    app.run(debug=True)
+@app.route('/plot_data', methods=['GET'])
+def plot_data():
+    return plot_manager.get_plot_json()

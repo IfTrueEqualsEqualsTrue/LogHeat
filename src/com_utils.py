@@ -144,3 +144,6 @@ def test_emulation():
     finally:
         simulator.stop()
         reader.stop()
+
+
+start_emulation()

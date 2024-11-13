@@ -1,7 +1,7 @@
 import csv
 import os
 
-from PathConfig import base_path
+from path_config import base_path
 
 temp_file_path = os.path.join(base_path, 'data', 'temp_csv.csv')
 

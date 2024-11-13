@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>Start Button</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script>
+        let plotInterval;
+
         document.addEventListener('DOMContentLoaded', (event) => {
             fetch('/get_com_ports')
                 .then(response => response.json())
@@ -23,7 +26,13 @@
                 .then(response => response.json())
                 .then(data => {
                     const button = document.getElementById('startButton');
-                    button.textContent = data.state ? 'Stop' : 'Start';
+                    if (data.state) {
+                        button.textContent = 'Stop';
+                        startPlotUpdate();
+                    } else {
+                        button.textContent = 'Start';
+                        stopPlotUpdate();
+                    }
                     console.log('State:', data.state);
                 });
         }
@@ -42,13 +51,31 @@
                 console.log('COM Port updated to:', data.port);
             });
         }
+
+        function startPlotUpdate() {
+            plotInterval = setInterval(updatePlot, 50);  // Update plot every 50ms
+        }
+
+        function stopPlotUpdate() {
+            clearInterval(plotInterval);
+        }
+
+        function updatePlot() {
+            fetch('/plot_data')
+                .then(response => response.json())
+                .then(data => {
+                    const plotDiv = document.getElementById('plot');
+                    Plotly.react(plotDiv, JSON.parse(data).data, JSON.parse(data).layout);
+                });
+        }
     </script>
 </head>
 <body>
-<select id="dropdownMenu" onchange="updateComPort()">
-    <!-- Options will be populated here -->
-</select>
-<br><br>
-<button id="startButton" onclick="toggleState()">Start</button>
+    <select id="dropdownMenu" onchange="updateComPort()">
+        <!-- Options will be populated here -->
+    </select>
+    <br><br>
+    <button id="startButton" onclick="toggleState()">Start</button>
+    <div id="plot"></div>
 </body>
 </html>

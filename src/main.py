@@ -1,7 +1,4 @@
-from Interface import MainApp
-
-""" Note : run this script with a configuration runnning main.py working in the project's directory """
+from web_app import app
 
 if __name__ == '__main__':
-    app = MainApp()
-    app.mainloop()
+    app.run(debug=True)
