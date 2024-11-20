@@ -25,5 +25,5 @@ void loop() {
   // Check for errors
   Serial.println(tempC);
   
-  delay(1000); // Wait 1 second between readings
+  delay(100); // Wait 1 second between readings
 }
