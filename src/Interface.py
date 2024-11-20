@@ -7,10 +7,12 @@ from tkinter import filedialog
 from ComEmulator import COMPortReader
 from LiveValuesPlotting import PlotManager
 from PathConfig import base_path
-from UI_Tools import ctk, center, fastgrid, colors
+from UI_Tools import ctk, center, fastgrid, colors, ImageLabel
 from Utils import get_available_com_ports
 
 global font
+
+logo_scale_ratio = 0.2
 
 
 class MainApp(ctk.CTk):
@@ -42,14 +44,18 @@ class MainFrame(ctk.CTkFrame):
                                                fg_color=colors['hwhite'], border_color=colors['yellow'], border_width=3,
                                                hover_color=colors['white'], text_color=colors['black'], height=35,
                                                width=200, font=font)
+        self.logo = ImageLabel(self, 'dark_logo.png', (1358 * logo_scale_ratio, 291 * logo_scale_ratio))
+        self.temperature_label = ctk.CTkLabel(self, text='38°C', font=font, text_color=colors['yellow'])
         self.plot_frame = None
         self.plot_manager = None
-        self.grid_rowconfigure((0, 2), weight=0)
-        self.grid_rowconfigure(1, weight=1)
-        self.grid_columnconfigure(0, weight=1)
+        self.grid_columnconfigure(0, weight=0)
+        self.grid_columnconfigure(1, weight=1)
+        self.grid_rowconfigure((0, 1, 2, 3), weight=1)
 
-        fastgrid(self.option_menu, 0, 0, 20, 20, '')
+        fastgrid(self.logo, 0, 0, 20, 20, '')
+        fastgrid(self.option_menu, 1, 0, 20, 20, '')
         fastgrid(self.start_stop_button, 2, 0, 20, 20, '')
+        fastgrid(self.temperature_label, 3, 0, 20, 20, '')
 
     def get_com_port(self):
         return self.option_menu.get()
@@ -64,7 +70,7 @@ class MainFrame(ctk.CTkFrame):
         com_port = self.get_com_port()
         self.plot_manager.set_reader(com_port)
         self.plot_frame = self.plot_manager.get_plot_frame(self)
-        fastgrid(self.plot_frame, 1, 0, 20, 20, 'nsew')
+        fastgrid(self.plot_frame, 0, 1, 20, 20, 'nsew', rowspan=4)
         self.plot_manager.start_animation()
 
     def button_clicked(self):

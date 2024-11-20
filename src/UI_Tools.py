@@ -18,3 +18,13 @@ def center(widget: ctk.CTkBaseClass):
 
 def fastgrid(widget: ctk.CTkBaseClass, x, y, xpad, ypad, sticky, columnspan=1, rowspan=1):
     widget.grid(row=x, column=y, padx=xpad, pady=ypad, sticky=sticky, columnspan=columnspan, rowspan=rowspan)
+
+
+class ImageLabel(ctk.CTkLabel):
+    """ Custom class to display an image"""
+
+    def __init__(self, master, image_path, image_size, **kwargs):
+        super().__init__(master, **kwargs)
+        self.configure(text='')
+        self.image = ctk.CTkImage(Image.open(os.path.join(base_path, 'ressources', image_path)), size=image_size)
+        self.configure(image=self.image)
