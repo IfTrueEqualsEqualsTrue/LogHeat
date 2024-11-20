@@ -21,10 +21,11 @@ ani = None
 
 
 class PlotManager:
-    def __init__(self, visible_timespan=visible_timespan, refresh_interval=refresh_interval):
+    def __init__(self, ui, visible_timespan=visible_timespan, refresh_interval=refresh_interval):
         self.visible_timespan = visible_timespan
         self.max_displayed_values = int(1000 * visible_timespan / refresh_interval)
         self.refresh_interval = refresh_interval
+        self.ui = ui
         self.com_reader = None
         self.start_time = None
         self.x_data = []
@@ -34,7 +35,7 @@ class PlotManager:
         self.last_mean_time = None
 
         self.fig, self.ax = plt.subplots()
-        self.ax.set_ylim(-10, 50)  # Set y-axis limits
+        # self.ax.set_ylim(-10, 50)  # Set y-axis limits
         self.plot_line, = self.ax.plot([], [], lw=2, color=colors["yellow"])
         self.ax.set_xlabel("Time (seconds)", fontsize=fontsize, labelpad=labelpad)
         self.ax.set_ylabel("Temperature (°C)", fontsize=fontsize, labelpad=labelpad)
@@ -71,6 +72,7 @@ class PlotManager:
                     self.x_data.append(elapsed_time)
                     self.accumulated_values = []  # Reset accumulated values
                     self.last_mean_time = elapsed_time
+                    self.ui.update_temperature(int(mean_value))
 
                 # Check if we need to add a vertical line on this new data point
                 if self.add_line_next:
@@ -92,6 +94,9 @@ class PlotManager:
         lower_bound = max(0, elapsed_time - self.visible_timespan)
         upper_bound = elapsed_time + 1
         self.ax.set_xlim(lower_bound, upper_bound)
+
+        self.ax.relim()
+        self.ax.autoscale_view()
 
     def add_vertical_line(self, x_position=None):
         """Adds a vertical line at the next data point if x_position is not provided."""
@@ -187,3 +192,4 @@ class CsvSaver:
             self.last_saved_index = current_length  # Update the last saved index
         else:
             print("No new data to save.")
+

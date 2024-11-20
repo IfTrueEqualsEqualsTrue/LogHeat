@@ -4,7 +4,6 @@ import threading
 import time
 from tkinter import filedialog
 
-from ComEmulator import COMPortReader
 from LiveValuesPlotting import PlotManager
 from PathConfig import base_path
 from UI_Tools import ctk, center, fastgrid, colors, ImageLabel
@@ -45,7 +44,8 @@ class MainFrame(ctk.CTkFrame):
                                                hover_color=colors['white'], text_color=colors['black'], height=35,
                                                width=200, font=font)
         self.logo = ImageLabel(self, 'dark_logo.png', (1358 * logo_scale_ratio, 291 * logo_scale_ratio))
-        self.temperature_label = ctk.CTkLabel(self, text='38°C', font=font, text_color=colors['yellow'])
+        self.temperature_label = ctk.CTkLabel(self, text='Waiting for\ntemperature', font=font,
+                                              text_color=colors['yellow'])
         self.plot_frame = None
         self.plot_manager = None
         self.grid_columnconfigure(0, weight=0)
@@ -66,7 +66,7 @@ class MainFrame(ctk.CTkFrame):
             self.plot_manager.stop_animation()
             self.plot_frame = None
             self.plot_manager = None
-        self.plot_manager = PlotManager()
+        self.plot_manager = PlotManager(self)
         com_port = self.get_com_port()
         self.plot_manager.set_reader(com_port)
         self.plot_frame = self.plot_manager.get_plot_frame(self)
@@ -92,12 +92,12 @@ class MainFrame(ctk.CTkFrame):
             shutil.copy(source, target_filename)
         except FileNotFoundError:
             pass
-    
+
     def start_blinking_thread(self):
         self.blinking_thread = threading.Thread(target=self.blinking_loop, daemon=True)
         self.blinking_thread_running = True
         self.blinking_thread.start()
-    
+
     def blinking_loop(self):
         while self.blinking_thread_running:
             time.sleep(self.blinking_interval)
@@ -109,4 +109,5 @@ class MainFrame(ctk.CTkFrame):
 
         self.blinking_thread_running = False  # Mark the thread as stopped when it exits
 
-    
+    def update_temperature(self, new_temperature):
+        self.temperature_label.configure(text=f'{new_temperature}°C', font=ctk.CTkFont('Cousine', size=40))
