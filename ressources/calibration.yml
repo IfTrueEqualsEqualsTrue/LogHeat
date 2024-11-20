@@ -1,0 +1,3 @@
+thermocouple:
+  coefficient: 1.0
+  offset: 0

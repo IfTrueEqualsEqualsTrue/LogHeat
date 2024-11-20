@@ -9,6 +9,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from CSV_Manager import CsvManager
 from ComEmulator import COMPortReader
 from UI_Tools import colors, ctk
+from Calibration import apply_calibration
 
 visible_timespan = 10
 refresh_interval = 50
@@ -67,7 +68,7 @@ class PlotManager:
 
                 if self.last_mean_time is None or (elapsed_time - self.last_mean_time) >= t_mean:
                     mean_value = sum(self.accumulated_values) / len(self.accumulated_values)
-                    print(f"Mean on {len(self.accumulated_values)} values")
+                    mean_value = apply_calibration(mean_value)
                     self.y_data.append(mean_value)
                     self.x_data.append(elapsed_time)
                     self.accumulated_values = []  # Reset accumulated values
