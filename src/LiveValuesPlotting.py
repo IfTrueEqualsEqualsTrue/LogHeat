@@ -13,6 +13,7 @@ from UI_Tools import colors, ctk
 visible_timespan = 10
 refresh_interval = 50
 backup_time = 3  # Time interval for backups in seconds
+t_mean = 0.5  # Time interval for calculating the mean value in seconds
 
 ani = None
 
@@ -27,6 +28,8 @@ class PlotManager:
         self.x_data = []
         self.y_data = []
         self.vertical_lines = []
+        self.accumulated_values = []
+        self.last_mean_time = None
 
         self.fig, self.ax = plt.subplots()
         self.ax.set_ylim(-10, 50)  # Set y-axis limits
@@ -54,8 +57,15 @@ class PlotManager:
         try:
             if not self.com_reader.data_queue.empty():
                 new_data = self.com_reader.data_queue.get_nowait()
-                self.y_data.append(new_data)
-                self.x_data.append(elapsed_time)
+                self.accumulated_values.append(new_data)
+
+                if self.last_mean_time is None or (elapsed_time - self.last_mean_time) >= t_mean:
+                    mean_value = sum(self.accumulated_values) / len(self.accumulated_values)
+                    print(f"Mean on {len(self.accumulated_values)} values")
+                    self.y_data.append(mean_value)
+                    self.x_data.append(elapsed_time)
+                    self.accumulated_values = []  # Reset accumulated values
+                    self.last_mean_time = elapsed_time
 
                 # Check if we need to add a vertical line on this new data point
                 if self.add_line_next:
