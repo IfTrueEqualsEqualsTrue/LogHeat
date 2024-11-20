@@ -14,6 +14,8 @@ visible_timespan = 10
 refresh_interval = 50
 backup_time = 3  # Time interval for backups in seconds
 t_mean = 0.5  # Time interval for calculating the mean value in seconds
+fontsize = 20
+labelpad = 25
 
 ani = None
 
@@ -34,8 +36,11 @@ class PlotManager:
         self.fig, self.ax = plt.subplots()
         self.ax.set_ylim(-10, 50)  # Set y-axis limits
         self.plot_line, = self.ax.plot([], [], lw=2, color=colors["yellow"])
-        self.ax.set_xlabel("Time (seconds)")  # Replace with your desired x-axis label
-        self.ax.set_ylabel("Temperature (°C)")  # Replace with your desired y-axis label
+        self.ax.set_xlabel("Time (seconds)", fontsize=fontsize, labelpad=labelpad)
+        self.ax.set_ylabel("Temperature (°C)", fontsize=fontsize, labelpad=labelpad)
+
+        # Set tick parameters for both axes
+        self.ax.tick_params(axis='both', which='major', labelsize=fontsize)
 
         self.csv_saver = CsvSaver(self, backup_time)
 
