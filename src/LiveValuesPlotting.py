@@ -73,7 +73,10 @@ class PlotManager:
                     self.x_data.append(elapsed_time)
                     self.accumulated_values = []  # Reset accumulated values
                     self.last_mean_time = elapsed_time
-                    self.ui.update_temperature(int(mean_value))
+                    try:
+                        self.ui.update_temperature(int(mean_value))
+                    except ValueError:
+                        print(f'Mean value : {mean_value}')
 
                 # Check if we need to add a vertical line on this new data point
                 if self.add_line_next:
