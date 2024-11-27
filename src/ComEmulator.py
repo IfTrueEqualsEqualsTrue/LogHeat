@@ -5,6 +5,7 @@ import threading
 import time
 
 import serial
+print(serial.__file__)
 
 logging.basicConfig(level=logging.ERROR)
 
