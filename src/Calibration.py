@@ -12,6 +12,11 @@ def load_calibration():
         return yaml.load(file, Loader=yaml.FullLoader)
 
 
+def write_calibration(calibration):
+    with open(os.path.join(base_path, 'ressources', 'calibration.yml'), 'w') as file:
+        yaml.dump(calibration, file)
+
+
 def get_calibration_parameters():
     """ Get the calibration parameters for the thermocouple. """
     calibration = load_calibration()
@@ -22,3 +27,12 @@ def apply_calibration(temperature):
     """ Apply the calibration to the temperature. """
     coefficient, offset = get_calibration_parameters()
     return temperature * coefficient + offset
+
+
+def set_calibration_parameters(coefficient, offset):
+    """ Set the calibration parameters for the thermocouple. """
+    calibration = load_calibration()
+    calibration['thermocouple']['coefficient'] = coefficient
+    calibration['thermocouple']['offset'] = offset
+    write_calibration(calibration)
+
