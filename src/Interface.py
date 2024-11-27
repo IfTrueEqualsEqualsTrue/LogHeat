@@ -21,12 +21,15 @@ class MainApp(ctk.CTk):
         super().__init__(**kwargs)
         self.title('LogHeat')
         self.geometry('1080x720')
-        self.iconbitmap(os.path.join(base_path, 'ressources', 'icon.ico'))
         self.configure(fg_color=colors['black'])
         font = ctk.CTkFont('Cousine', size=20)
         self.mainFrame = MainFrame(self, fg_color='transparent')
         center(self)
         fastgrid(self.mainFrame, 0, 0, 0, 0, "nsew")
+        self.after(201, self.set_seticon)
+
+    def set_seticon(self):
+        self.iconbitmap(os.path.join(base_path, 'ressources', r'icon.ico'))
 
 
 class MainFrame(ctk.CTkFrame):
