@@ -26,7 +26,7 @@ class MainApp(ctk.CTk):
         self.mainFrame = MainFrame(self, fg_color='transparent')
         center(self)
         fastgrid(self.mainFrame, 0, 0, 0, 0, "nsew")
-        self.after(201, self.set_seticon)
+        # self.after(201, self.set_seticon)
 
     def set_seticon(self):
         self.iconbitmap(os.path.join(base_path, 'ressources', r'icon.ico'))
