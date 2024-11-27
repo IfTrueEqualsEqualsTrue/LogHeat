@@ -95,13 +95,23 @@ class COMPortReader:
     def run(self):
         while self.is_running:
             try:
-                data = self.ser.readline().decode('utf-8').strip()  # strip removes trailing \r\n
+                # Attempt to read the line from the serial port
+                raw_data = self.ser.readline()
+                try:
+                    # Try to decode the data with UTF-8
+                    data = raw_data.decode('utf-8').strip()
+                except UnicodeDecodeError:
+                    # If decoding fails, log the error or handle accordingly
+                    logging.warning(f"Received non-UTF-8 data: {raw_data}")
+                    continue  # Skip to the next line
+
                 if data:
                     try:
+                        # Attempt to convert the data to a float
                         temperature = float(data)
                         self.data_queue.put(temperature)
                     except ValueError:
-                        logging.error(f"Invalid data received: {data}")  # Handle any non-float data
+                        logging.error(f"Invalid data received: {data}")  # Handle non-float data
             except serial.SerialException as e:
                 logging.error(f"Serial port error: {e}")
 
