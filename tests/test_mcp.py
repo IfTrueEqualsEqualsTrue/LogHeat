@@ -3,12 +3,12 @@ import time
 import spidev
 
 # MCP3004 Configuration
-CS_PIN = 8  # GPIO 8 (You may not need to specify this, use 0, 0 instead)
+CS_PIN = 1  # GPIO 8 (You may not need to specify this, use 0, 0 instead)
 
 
 def setup_spi():
     spi = spidev.SpiDev()
-    spi.open(0, 0)  # Open SPI bus 0, device 0 (chip select managed automatically)
+    spi.open(0, CS_PIN)  # Open SPI bus 0, device 0 (chip select managed automatically)
     spi.max_speed_hz = 1000000  # Set SPI clock speed to 1 MHz (safe range for MCP3004)
     spi.mode = 0  # Ensure SPI mode is 0 (CPOL = 0, CPHA = 0)
     return spi
