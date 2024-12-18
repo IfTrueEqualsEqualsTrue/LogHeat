@@ -97,6 +97,7 @@ class COMPortReader:
             try:
                 # Attempt to read the line from the serial port
                 raw_data = self.ser.readline()
+                print(raw_data)
                 try:
                     # Try to decode the data with UTF-8
                     data = raw_data.decode('utf-8').strip()
