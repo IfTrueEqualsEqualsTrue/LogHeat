@@ -8,7 +8,7 @@ CS_PIN = 7  # GPIO 7
 
 def setup_spi():
     spi = spidev.SpiDev()
-    spi.open(0, CS_PIN)  # Open SPI bus 0 and the CS_PIN as the chip select
+    spi.open(1, CS_PIN)  # Open SPI bus 0 and the CS_PIN as the chip select
     spi.max_speed_hz = 1350000  # Set SPI clock speed
     return spi
 
