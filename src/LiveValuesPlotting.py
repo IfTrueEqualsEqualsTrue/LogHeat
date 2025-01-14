@@ -11,7 +11,7 @@ from ComEmulator import COMPortReader
 from UI_Tools import colors, ctk
 from Calibration import apply_calibration
 
-visible_timespan = 150
+visible_timespan = 10
 refresh_interval = 50
 backup_time = 3  # Time interval for backups in seconds
 t_mean = 0.5  # Time interval for calculating the mean value in seconds
