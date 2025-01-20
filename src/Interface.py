@@ -7,7 +7,6 @@ from tkinter import filedialog
 from LiveValuesPlotting import PlotManager
 from PathConfig import base_path
 from UI_Tools import ctk, center, fastgrid, colors, ImageLabel
-from Utils import get_available_com_ports
 
 global font
 
@@ -39,9 +38,6 @@ class MainFrame(ctk.CTkFrame):
         self.blinking_interval = 1
         self.blinking_thread_running = None
         self.blinking_thread = None
-        self.option_menu = ctk.CTkOptionMenu(self, values=get_available_com_ports(), command=self.update_com_port,
-                                             fg_color=colors['white'], button_color=colors['yellow'], font=font,
-                                             text_color=colors['black'])
         self.start_stop_button = ctk.CTkButton(self, command=self.button_clicked, text='Start',
                                                fg_color=colors['hwhite'], border_color=colors['yellow'], border_width=3,
                                                hover_color=colors['white'], text_color=colors['black'], height=35,
@@ -53,25 +49,22 @@ class MainFrame(ctk.CTkFrame):
         self.plot_manager = None
         self.grid_columnconfigure(0, weight=0)
         self.grid_columnconfigure(1, weight=1)
-        self.grid_rowconfigure((0, 1, 2, 3), weight=1)
+        self.grid_rowconfigure((0, 1, 2), weight=1)
+
+        self.start_spi()
 
         fastgrid(self.logo, 0, 0, 20, 20, '')
-        fastgrid(self.option_menu, 1, 0, 20, 20, '')
-        fastgrid(self.start_stop_button, 2, 0, 20, 20, '')
-        fastgrid(self.temperature_label, 3, 0, 20, 20, '')
+        fastgrid(self.start_stop_button, 1, 0, 20, 20, '')
+        fastgrid(self.temperature_label, 2, 0, 20, 20, '')
 
-    def get_com_port(self):
-        return self.option_menu.get()
-
-    def update_com_port(self, event=None):
+    def start_spi(self):
         if self.plot_frame is not None:
             self.plot_frame.grid_remove()
             self.plot_manager.stop_animation()
             self.plot_frame = None
             self.plot_manager = None
         self.plot_manager = PlotManager(self)
-        com_port = self.get_com_port()
-        self.plot_manager.set_reader(com_port)
+        self.plot_manager.set_reader()
         self.plot_frame = self.plot_manager.get_plot_frame(self)
         fastgrid(self.plot_frame, 0, 1, 20, 20, 'nsew', rowspan=4)
         self.plot_manager.start_animation()
