@@ -9,30 +9,40 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from CSV_Manager import CsvManager
 from ComEmulator import COMPortReader
 from UI_Tools import colors, ctk
+from Calibration import apply_calibration
 
 visible_timespan = 10
 refresh_interval = 50
 backup_time = 3  # Time interval for backups in seconds
+t_mean = 0.5  # Time interval for calculating the mean value in seconds
+fontsize = 20
+labelpad = 25
 
 ani = None
 
 
 class PlotManager:
-    def __init__(self, visible_timespan=visible_timespan, refresh_interval=refresh_interval):
+    def __init__(self, ui, visible_timespan=visible_timespan, refresh_interval=refresh_interval):
         self.visible_timespan = visible_timespan
         self.max_displayed_values = int(1000 * visible_timespan / refresh_interval)
         self.refresh_interval = refresh_interval
+        self.ui = ui
         self.com_reader = None
         self.start_time = None
         self.x_data = []
         self.y_data = []
         self.vertical_lines = []
+        self.accumulated_values = []
+        self.last_mean_time = None
 
         self.fig, self.ax = plt.subplots()
-        self.ax.set_ylim(-10, 50)  # Set y-axis limits
+        # self.ax.set_ylim(-10, 50)  # Set y-axis limits
         self.plot_line, = self.ax.plot([], [], lw=2, color=colors["yellow"])
-        self.ax.set_xlabel("Time (seconds)")  # Replace with your desired x-axis label
-        self.ax.set_ylabel("Temperature (°C)")  # Replace with your desired y-axis label
+        self.ax.set_xlabel("Time (seconds)", fontsize=fontsize, labelpad=labelpad)
+        self.ax.set_ylabel("Temperature (°C)", fontsize=fontsize, labelpad=labelpad)
+
+        # Set tick parameters for both axes
+        self.ax.tick_params(axis='both', which='major', labelsize=fontsize)
 
         self.csv_saver = CsvSaver(self, backup_time)
 
@@ -54,8 +64,19 @@ class PlotManager:
         try:
             if not self.com_reader.data_queue.empty():
                 new_data = self.com_reader.data_queue.get_nowait()
-                self.y_data.append(new_data)
-                self.x_data.append(elapsed_time)
+                self.accumulated_values.append(new_data)
+
+                if self.last_mean_time is None or (elapsed_time - self.last_mean_time) >= t_mean:
+                    mean_value = sum(self.accumulated_values) / len(self.accumulated_values)
+                    mean_value = apply_calibration(mean_value)
+                    self.y_data.append(mean_value)
+                    self.x_data.append(elapsed_time)
+                    self.accumulated_values = []  # Reset accumulated values
+                    self.last_mean_time = elapsed_time
+                    try:
+                        self.ui.update_temperature(int(mean_value))
+                    except ValueError:
+                        print(f'Mean value : {mean_value}')
 
                 # Check if we need to add a vertical line on this new data point
                 if self.add_line_next:
@@ -77,6 +98,9 @@ class PlotManager:
         lower_bound = max(0, elapsed_time - self.visible_timespan)
         upper_bound = elapsed_time + 1
         self.ax.set_xlim(lower_bound, upper_bound)
+
+        self.ax.relim()
+        self.ax.autoscale_view()
 
     def add_vertical_line(self, x_position=None):
         """Adds a vertical line at the next data point if x_position is not provided."""
@@ -172,3 +196,4 @@ class CsvSaver:
             self.last_saved_index = current_length  # Update the last saved index
         else:
             print("No new data to save.")
+
