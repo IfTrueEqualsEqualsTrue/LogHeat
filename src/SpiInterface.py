@@ -1,4 +1,4 @@
-# import spidev
+import spidev
 import threading
 import queue
 import time
