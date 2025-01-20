@@ -7,9 +7,9 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 from CSV_Manager import CsvManager
-from ComEmulator import COMPortReader
 from UI_Tools import colors, ctk
 from Calibration import apply_calibration
+from src.SpiInterface import SPIReader
 
 visible_timespan = 10
 refresh_interval = 50
@@ -27,26 +27,23 @@ class PlotManager:
         self.max_displayed_values = int(1000 * visible_timespan / refresh_interval)
         self.refresh_interval = refresh_interval
         self.ui = ui
-        self.com_reader = None
+        self.spi_reader = None
         self.start_time = None
         self.x_data = []
         self.y_data = []
         self.vertical_lines = []
         self.accumulated_values = []
         self.last_mean_time = None
+        self.data_queue = queue.Queue()  # Initialize the data queue
 
         self.fig, self.ax = plt.subplots()
-        # self.ax.set_ylim(-10, 50)  # Set y-axis limits
         self.plot_line, = self.ax.plot([], [], lw=2, color=colors["yellow"])
         self.ax.set_xlabel("Time (seconds)", fontsize=fontsize, labelpad=labelpad)
         self.ax.set_ylabel("Temperature (°C)", fontsize=fontsize, labelpad=labelpad)
-
-        # Set tick parameters for both axes
         self.ax.tick_params(axis='both', which='major', labelsize=fontsize)
 
         self.csv_saver = CsvSaver(self, backup_time)
-
-        self.add_line_next = False  # Flag to control when to add a vertical line
+        self.add_line_next = False
 
     def update_plot(self, frame):
         current_time = time.time()
@@ -62,26 +59,25 @@ class PlotManager:
 
     def get_new_data(self, elapsed_time):
         try:
-            if not self.com_reader.data_queue.empty():
-                new_data = self.com_reader.data_queue.get_nowait()
-                self.accumulated_values.append(new_data)
+            if not self.data_queue.empty():
+                new_data = self.data_queue.get_nowait()
+                self.accumulated_values.append(new_data["thermocouple_temperature"])
 
                 if self.last_mean_time is None or (elapsed_time - self.last_mean_time) >= t_mean:
                     mean_value = sum(self.accumulated_values) / len(self.accumulated_values)
                     mean_value = apply_calibration(mean_value)
                     self.y_data.append(mean_value)
                     self.x_data.append(elapsed_time)
-                    self.accumulated_values = []  # Reset accumulated values
+                    self.accumulated_values = []
                     self.last_mean_time = elapsed_time
                     try:
                         self.ui.update_temperature(int(mean_value))
                     except ValueError:
                         print(f'Mean value : {mean_value}')
 
-                # Check if we need to add a vertical line on this new data point
                 if self.add_line_next:
                     self.add_vertical_line(elapsed_time)
-                    self.add_line_next = False  # Reset the flag after adding the line
+                    self.add_line_next = False
 
                 return new_data
         except queue.Empty:
@@ -126,11 +122,11 @@ class PlotManager:
         canvas.get_tk_widget().pack(fill="both", expand=True)
         return frame
 
-    def set_reader(self, port):
-        if self.com_reader is not None:
-            self.com_reader.stop()
-        self.com_reader = COMPortReader.get_instance(port)
-        self.com_reader.start()
+    def set_reader(self):
+        if self.spi_reader is not None:
+            self.spi_reader.stop()
+        self.spi_reader = SPIReader(self.data_queue)
+        self.spi_reader.start()
 
     def start_saving(self):
         self.csv_saver.start_saving()
@@ -196,4 +192,3 @@ class CsvSaver:
             self.last_saved_index = current_length  # Update the last saved index
         else:
             print("No new data to save.")
-
