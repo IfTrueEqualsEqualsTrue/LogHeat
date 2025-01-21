@@ -38,7 +38,7 @@ class PlotManager:
 
         self.fig, self.ax = plt.subplots()
         self.plot_line, = self.ax.plot([], [], lw=2, color=colors["yellow"])
-        self.ax.set_xlabel("Time (seconds)", fontsize=fontsize, labelpad=labelpad)
+        self.ax.set_xlabel("Time (seconds)", fontsize=fontsize, labelpad=labelpad + 10)
         self.ax.set_ylabel("Temperature (°C)", fontsize=fontsize, labelpad=labelpad)
         self.ax.tick_params(axis='both', which='major', labelsize=fontsize)
 
