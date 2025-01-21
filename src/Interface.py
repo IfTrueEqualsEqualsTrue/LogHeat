@@ -19,7 +19,7 @@ class MainApp(ctk.CTk):
         global font
         super().__init__(**kwargs)
         self.title('LogHeat')
-        self.geometry('1080x720')
+        self.geometry('720x480')
         self.configure(fg_color=colors['black'])
         font = ctk.CTkFont('Cousine', size=20)
         self.mainFrame = MainFrame(self, fg_color='transparent')
