@@ -1,5 +1,6 @@
-import serial
 import time
+
+import serial
 
 ser = serial.Serial('COM5', 9600, timeout=1)
 ser.flush()
@@ -17,7 +18,7 @@ while True:
             print(f"Voltage 1: {voltages[0]}V")
             print(f"Voltage 2: {voltages[1]}V")
             print(f"moy : {moy:.2f}V")
-            print(f'Difference : {float(voltages[1])-float(voltages[0]):.2f} V')
+            print(f'Difference : {float(voltages[1]) - float(voltages[0]):.2f} V')
             print("--------------------")
             i += 1
     time.sleep(1)

@@ -1,3 +1,5 @@
+""" Tools for the UI """
+
 import os
 
 import customtkinter as ctk

@@ -1,7 +1,7 @@
-import spidev
 import threading
-import queue
 import time
+
+import spidev
 
 
 class SPIReader(threading.Thread):
@@ -25,17 +25,22 @@ class SPIReader(threading.Thread):
         response = self.spi.xfer2([0x00, 0x00, 0x00, 0x00])
         raw_data = (response[0] << 24) | (response[1] << 16) | (response[2] << 8) | response[3]
         thermocouple_data = (raw_data >> 18) & 0x3FFF
+
         if thermocouple_data & 0x2000:
             thermocouple_data -= 0x4000
+
         thermocouple_temperature = thermocouple_data * 0.25
         fault = (raw_data >> 16) & 0x1
         internal_data = (raw_data >> 4) & 0xFFF
+
         if internal_data & 0x800:
             internal_data -= 0x1000
+
         internal_temperature = internal_data * 0.0625
         scv_fault = (raw_data >> 2) & 0x1
         scg_fault = (raw_data >> 1) & 0x1
         oc_fault = raw_data & 0x1
+
         return {
             "thermocouple_temperature": thermocouple_temperature,
             "internal_temperature": internal_temperature,

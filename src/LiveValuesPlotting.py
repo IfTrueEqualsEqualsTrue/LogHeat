@@ -7,9 +7,9 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 from CSV_Manager import CsvManager
-from UI_Tools import colors, ctk
 from Calibration import apply_calibration
 from SpiInterface import SPIReader
+from UI_Tools import colors, ctk
 
 visible_timespan = 10
 refresh_interval = 50
