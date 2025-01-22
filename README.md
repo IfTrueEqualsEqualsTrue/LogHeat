@@ -8,9 +8,37 @@ This project is a temperature logging system developed during the 2024 Biomedica
 - **Data visualization**: Provides a graphical interface for displaying temperature trends over time.
 - **Simple UI**: User-friendly interface for ease of use by non-technical users.
   
+This app does not include the possibility for the MCP inputs but it can be easily tweaked in the file ```SpiInteface.py```
+
 ## Hardware Requirements
-- Temperature sensor (compatible with the system)
-- Computer running Python
+- Thermocouple sensor
+- MAX31855 thermocouple conditionning circuit
+
+## Running the Application
+
+The main.py file is the entry point for the application. The required packages can be installed in a new virtual environment using:
+
+```bash
+pip install -r requirements.txt
+```
+
+To run the application, execute the main file using the following command:
+
+```bash
+python src/main.py
+```
+
+## Compiling
+
+To use the app on as a standalone, it can be compiled using pyinstaller.
+
+Use the following command to compile the app:
+
+```bash
+pyinstaller main.spec
+```
+
+This will create a dist folder containing the compiled app. Compile on the os the app should be used on, but keep in mind spidev works only on the raspberry pi.
 
 ## Contributors
 Grenoble INP Biomedical Engineering Students:

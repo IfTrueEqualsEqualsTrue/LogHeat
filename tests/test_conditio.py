@@ -2,8 +2,8 @@ import time
 
 import spidev
 
-# Thermocouple Acquisition Circuit Configuration
-CS_PIN = 0  # GPIO 7
+SPI_BUS = 0
+CS_PIN = 0
 
 
 def setup_spi():
@@ -11,7 +11,7 @@ def setup_spi():
     Initialize the SPI bus and configure its parameters.
     """
     spi = spidev.SpiDev()
-    spi.open(0, 0)  # Open SPI bus 0, device 0
+    spi.open(SPI_BUS, CS_PIN)
     spi.max_speed_hz = 1350000  # Set SPI clock speed
     spi.mode = 0b00  # Set SPI mode (CPOL=0, CPHA=0)
     spi.bits_per_word = 8  # Set SPI word size to 8 bits
@@ -20,7 +20,7 @@ def setup_spi():
 
 def read_thermocouple(spi):
     """
-    Read and decode data from the thermocouple.
+    Read and decode data from the thermocouple. This is based on the MAX datasheet.
     """
     # Send dummy bytes to trigger SPI read
     response = spi.xfer2([0x00, 0x00, 0x00, 0x00])

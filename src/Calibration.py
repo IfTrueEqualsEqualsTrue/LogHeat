@@ -35,4 +35,3 @@ def set_calibration_parameters(coefficient, offset):
     calibration['thermocouple']['coefficient'] = coefficient
     calibration['thermocouple']['offset'] = offset
     write_calibration(calibration)
-

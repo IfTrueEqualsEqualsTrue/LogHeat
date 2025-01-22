@@ -1,15 +1,15 @@
-import spidev
 import time
 
-# MCP3004 Configuration
+import spidev
+
 SPI_BUS = 0
-CS_PIN = 1  # SPI CS0 (géré par spidev)
+CS_PIN = 1
 
 
 def setup_spi():
     spi = spidev.SpiDev()
-    spi.open(SPI_BUS, CS_PIN)  # Bus SPI 0, périphérique CS0
-    spi.max_speed_hz = 500000  # Vitesse SPI (500 kHz pour fiabilité)
+    spi.open(SPI_BUS, CS_PIN)
+    spi.max_speed_hz = 500000
     return spi
 
 
