@@ -38,7 +38,7 @@ Use the following command to compile the app:
 pyinstaller main.spec
 ```
 
-This will create a dist folder containing the compiled app. Compile on the os the app should be used on.
+This will create a dist folder containing the compiled app. Compile on the os the app should be used on, but keep in mind spidev works only on the raspberry pi.
 
 ## Contributors
 Grenoble INP Biomedical Engineering Students:
