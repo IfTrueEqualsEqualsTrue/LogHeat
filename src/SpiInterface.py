@@ -1,11 +1,13 @@
 import threading
 import time
 
-import spidev
+# import spidev  # This won't work on Windows, only Linux
 
 
 class SPIReader(threading.Thread):
-    def __init__(self, data_queue, spi_bus=0, spi_device=0, max_speed_hz=1350000):
+    """ This class is used to read data from the MAX31855 thermocouple sensor using SPI interface"""
+
+    def __init__(self, queue, spi_bus=0, spi_device=0, max_speed_hz=1350000):
         super().__init__()
         self.spi = spidev.SpiDev()
         self.spi.open(spi_bus, spi_device)
@@ -19,9 +21,10 @@ class SPIReader(threading.Thread):
         while self.running:
             data = self.read_thermocouple()
             self.data_queue.put(data)
-            time.sleep(0.5)
+            time.sleep(0.5)  # You can change this to adjust the reading frequency
 
     def read_thermocouple(self):
+        """ This has been built thanks to the datasheet of the MAX31855. """
         response = self.spi.xfer2([0x00, 0x00, 0x00, 0x00])
         raw_data = (response[0] << 24) | (response[1] << 16) | (response[2] << 8) | response[3]
         thermocouple_data = (raw_data >> 18) & 0x3FFF

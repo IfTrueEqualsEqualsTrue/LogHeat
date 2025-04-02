@@ -57,6 +57,7 @@ class MainFrame(ctk.CTkFrame):
         fastgrid(self.temperature_label, 2, 0, 20, 20, '')
 
     def start_spi(self):
+        """ Start the SPI communication and create the plot manager."""
         if self.plot_frame is not None:
             self.plot_frame.grid_remove()
             self.plot_manager.stop_animation()
@@ -69,6 +70,7 @@ class MainFrame(ctk.CTkFrame):
         self.plot_manager.start_animation()
 
     def button_clicked(self):
+        """ Handle the button click event to start or stop saving data."""
         self.plot_manager.add_vertical_line()
         if self.plot_manager.csv_saver.is_saving:
             self.plot_manager.csv_saver.stop_saving()
@@ -94,6 +96,7 @@ class MainFrame(ctk.CTkFrame):
         self.blinking_thread.start()
 
     def blinking_loop(self):
+        """ Blink the button while saving data."""
         while self.blinking_thread_running:
             time.sleep(self.blinking_interval)
             if not self.plot_manager.csv_saver.is_saving:
@@ -105,4 +108,5 @@ class MainFrame(ctk.CTkFrame):
         self.blinking_thread_running = False  # Mark the thread as stopped when it exits
 
     def update_temperature(self, new_temperature):
+        """ Update the temperature label with the new temperature."""
         self.temperature_label.configure(text=f'{new_temperature}°C', font=ctk.CTkFont('Cousine', size=40))

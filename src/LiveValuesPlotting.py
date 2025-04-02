@@ -8,11 +8,11 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 from CSV_Manager import CsvManager
 from Calibration import apply_calibration
-from SpiInterface import SPIReader
 from UI_Tools import colors, ctk
+from emulator import COMPortReader
 
-visible_timespan = 10
-refresh_interval = 50
+visible_timespan = 10  # Time span for the visible plot in seconds
+refresh_interval = 50  # Refresh interval for the plot in milliseconds
 backup_time = 3  # Time interval for backups in seconds
 t_mean = 0.5  # Time interval for calculating the mean value in seconds
 fontsize = 20
@@ -22,12 +22,14 @@ ani = None
 
 
 class PlotManager:
+    """ Manages the live plotting of temperature data from a thermocouple. """
+
     def __init__(self, ui, visible_timespan=visible_timespan, refresh_interval=refresh_interval):
         self.visible_timespan = visible_timespan
         self.max_displayed_values = int(1000 * visible_timespan / refresh_interval)
         self.refresh_interval = refresh_interval
         self.ui = ui
-        self.spi_reader = None
+        self.data_reader = None
         self.start_time = None
         self.x_data = []
         self.y_data = []
@@ -46,6 +48,7 @@ class PlotManager:
         self.add_line_next = False
 
     def update_plot(self, frame):
+        """ Updates the plot with new data and manages the vertical lines. """
         current_time = time.time()
         if self.start_time is None:
             self.start_time = current_time
@@ -58,10 +61,16 @@ class PlotManager:
         return self.plot_line, self.vertical_lines
 
     def get_new_data(self, elapsed_time):
+        """ Fetches new data from the queue and updates the plot. """  # TODO : this function should be splitted & cleaned
         try:
             if not self.data_queue.empty():
                 new_data = self.data_queue.get_nowait()
-                self.accumulated_values.append(new_data["thermocouple_temperature"])
+                if isinstance(new_data, dict):  # Spi output
+                    self.accumulated_values.append(new_data["thermocouple_temperature"])
+                elif isinstance(new_data, str):  # Emulator output
+                    self.accumulated_values.append(int(new_data))
+                else:
+                    raise ValueError("Invalid data type received from the queue.")
 
                 if self.last_mean_time is None or (elapsed_time - self.last_mean_time) >= t_mean:
                     mean_value = sum(self.accumulated_values) / len(self.accumulated_values)
@@ -85,6 +94,7 @@ class PlotManager:
         return None
 
     def update_plot_data(self, elapsed_time, new_data):
+        """ Updates the plot data with new values and manages the x and y data lists. """
         if len(self.x_data) > self.max_displayed_values:
             self.x_data = self.x_data[-self.max_displayed_values:]
             self.y_data = self.y_data[-self.max_displayed_values:]
@@ -107,6 +117,7 @@ class PlotManager:
             self.vertical_lines.append(line)
 
     def clean_old_lines(self, elapsed_time):
+        """ Removes old vertical lines that are outside the visible timespan."""
         lower_bound = max(0, elapsed_time - self.visible_timespan)
         self.vertical_lines = [line for line in self.vertical_lines if line.get_xdata()[0] >= lower_bound]
 
@@ -116,6 +127,7 @@ class PlotManager:
         return ani
 
     def get_plot_frame(self, master):
+        """ Creates a frame for the plot and embeds it in the given master widget. """
         frame = ctk.CTkFrame(master, fg_color='transparent')
         canvas = FigureCanvasTkAgg(self.fig, master=frame)
         canvas.draw()
@@ -123,10 +135,11 @@ class PlotManager:
         return frame
 
     def set_reader(self):
-        if self.spi_reader is not None:
-            self.spi_reader.stop()
-        self.spi_reader = SPIReader(self.data_queue)
-        self.spi_reader.start()
+        if self.data_reader is not None:
+            self.data_reader.stop()
+        # self.data_reader = SPIReader(queue=self.data_queue)  # Use SPIReader for real data
+        self.data_reader = COMPortReader(queue=self.data_queue)  # Use COMPortReader for emulation
+        self.data_reader.start()
 
     def start_saving(self):
         self.csv_saver.start_saving()
